@@ -1,1 +1,182 @@
+#include <xc.h>
+int i=0,b=0,count=0; int k=0, stop_flge;
+char s[20]="MACHINE ON";
+char s1[20]=" SELECTE FEATURE";
+char s2[20]="LOW SPEED RUNNIG";
+char s3[20]="MEDIUM SPEED RUNNIG";
+char s4[20]="HIGH SPEED RUNNIG";
+char s5[20]="MACHINE OFF";
+char s6[20]="COMPLETED";
+void delay(unsigned int a)
+{
+    while(a--);
+}
+void enable()
+{
+    RE1=1;
+    delay(50);
+    RE1=0;
+    delay(50);
+}
+void preset(char a,char p)
+{
+    RE0=a;
+    PORTC=p;
+    enable();
+}
+void display(char *x)
+{
+    for(i=0; x[i]!='\0'; i++)
+    {
+        preset(1,x[i]);
+    }
+}
+void timer(int c)
+{
+    int count=c*18;
+    while(count)
+    {
+        if(RB3==1)
+        {
+            stop_flge=1;
+            break;
+        }
+    if(T0IF==1)
+    {
+    count--;
+    T0IF=0;
+    TMR0=39;
+    }
+    }
+    if(stop_flge==1)
+    {
+         preset(0,0x01);
+         preset(0,0x80);
+         display(s5);
+         PORTA=0X00;
+         b=0;
+         k=0;
+         stop_flge=0;
+    }
+ }
+void main(void) {
+    PORTA=PORTB=PORTC=PORTE=0X00;
+    TRISA=TRISC=TRISE=0X00;
+    TRISB=0X0F;
+    ANSEL=ANSELH=0X00;
+    TMR0=39;
+    OPTION_REG=0X87;
+    GIE=1;
+    
+    preset(0,0x38);
+    preset(0,0x0e);
+    //preset(0,0x80);
+   // preset(0,0xc0);
+    while(1)
+    {
+        if(RB0==1)
+        {
+            b=1;
+            preset(0,0x01);
+            preset(0,0x80);
+            display(s);
+            timer(1);
+            preset(0,0xc0);
+            display(s1);
+            timer(1);
+            while(RB0==1);
+        }
+          if(RB1==1)
+          {
+              if(b==1)
+              {
+                  k++;
+                  
+                      
+              }
+              while(RB1==1);   
+          }
+             if(RB2==1)
+              {
+              if(k==1)
+              {
+                  
+                  preset(0,0x01);
+                  preset(0,0x80);
+                  display(s2); 
+                  RA0=1; RA1=0;
+               timer(5);
+               RA1=1; RA0=0;
+               timer(5);
+              RA0=0; RA1=0;
+              preset(0,0x01);
+              preset(0,0x80);
+              display(s6);
+              timer(2);
+              preset(0,0x01);
+              preset(0,0xc0);
+              display(s1);
+              if(RB3==1)
+              {
+                   preset(0,0x01);
+              preset(0,0xc0);
+              display(s5);
+              }
+          }
+              
+        if(k==2)
+              {
+              preset(0,0x01);
+              preset(0,0x80);
+              display(s3);
+              RA0=1; RA1=0;
+               timer(4);
+               RA1=1; RA0=0;
+               timer(3);
+              RA0=0; RA1=0;
+              preset(0,0x01);
+              preset(0,0x80);
+              display(s6);
+               timer(2);
+               preset(0,0xc0);
+              preset(0,0x01);             
+               display(s1);
+                if(RB3==1)
+              {
+                   preset(0,0x01);
+              preset(0,0xc0);
+              display(s5);
+              }
+          }
+          
+           if(k==3)
+              {
+              preset(0,0x01);
+              preset(0,0xc0);
+              display(s4);
+               RA0=1; RA1=0;
+               timer(2);
+               RA1=1; RA0=0;
+               timer(3);
+              RA0=0; RA1=0;
+              preset(0,0x01);
+              preset(0,0xc0);
+              display(s6);
+              timer(2);
+              preset(0,0x01);
+              preset(0,0xc0);
+              display(s1);
+              if(RB3==1)
+              {
+                   preset(0,0x01);
+              preset(0,0xc0);
+              display(s5);
+              }
+          }
+           while(RB1==1); 
+          }
+        
+    }
+    return;
+}
 
